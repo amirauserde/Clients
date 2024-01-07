@@ -1,11 +1,11 @@
-import Service.ClientsConsole;
+import View.ClientConsole;
 
 public class Main {
     public static void main(String[] args) {
-        try (ClientsConsole newConsole = new ClientsConsole()) {
+        try (ClientConsole newConsole = ClientConsole.getInstance()) {
             newConsole.run();
         } catch (Exception e) {
-            System.out.println("Error occurred!");
+            throw new RuntimeException();
         }
     }
 }

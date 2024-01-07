@@ -1,15 +1,14 @@
 package Model;
 
-import Model.Contact.Contacts;
+import Model.Contact.Contact;
 
-public class PersonaClient extends Client {
+public class RealClient extends Client {
     Person client;
 
-
-    public PersonaClient(String firstName, String lastName, ClientPriority priority) {
+    public RealClient(String firstName, String lastName, ClientPriority priority) {
         super(lastName + ", " + firstName, priority);
         client = new Person(firstName, lastName);
-        contact = new Contacts(firstName + " " + lastName + "contact details");
+        contact = new Contact(firstName + " " + lastName + "contact details");
     }
 
     @Override

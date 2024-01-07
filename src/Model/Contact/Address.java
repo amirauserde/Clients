@@ -10,8 +10,12 @@ public class Address {
     private String city;
     private String address;
 
-    public Address(String country, String city, String address, AddressType addressType) {
-        this.addressType = addressType;
+    public Address(String country, String city, String address, String  addressType) {
+        try {
+            this.addressType = AddressType.valueOf(addressType);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Wrong address type!");
+        }
         this.country = country;
         this.city = city;
         this.address = address;

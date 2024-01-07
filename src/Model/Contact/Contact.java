@@ -1,37 +1,26 @@
 package Model.Contact;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class Contacts {
+public class Contact {
     private String contactName;
-    private ArrayList<PhoneNumber> numbers;
+    private final ArrayList<PhoneNumber> numbers;
     private String emailAddress;
-    private ArrayList<Address> addresses;
+    private final ArrayList<Address> addresses;
 
-    public Contacts(String contactName) {
+    public Contact(String contactName) {
         this.contactName = contactName;
         this.numbers = new ArrayList<>();
         this.addresses = new ArrayList<>();
     }
 
-    public boolean addNumber(String number, String type) {
-        if(numbers.stream().anyMatch(s -> s.getNumber().equals(number))) {
-            return false;
-        }
-        numbers.add(new PhoneNumber(number, NumberType.valueOf(type.toUpperCase())));
-        return true;
+    public ArrayList<PhoneNumber> getNumbers() {
+        return numbers;
     }
 
-    public boolean addAddress(String country, String city, String address, String addressType) {
-        Address newAddress = new Address(country, city, address, AddressType.valueOf(addressType));
-        if(addresses.contains(newAddress)) {
-            return false;
-        } else {
-            addresses.add(newAddress);
-            return true;
-        }
+    public ArrayList<Address> getAddresses() {
+        return addresses;
     }
+
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
