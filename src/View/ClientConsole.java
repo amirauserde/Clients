@@ -54,7 +54,7 @@ public class ClientConsole implements AutoCloseable {
         if(searchedIds.isEmpty()) {
             System.out.println("No results found!");
         } else {
-            searchedIds.forEach(clientId -> System.out.println(newCM.clientBrief(clientId)));
+            searchedIds.forEach(clientId -> System.out.println(newCM.activeClientBrief(clientId)));
             int chosenID = Integer.valueOf(getUserInput("For more details enter the client ID:"));
 
             if(!searchedIds.contains(chosenID)) {

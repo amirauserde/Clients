@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.function.Predicate.not;
+
 public class ClientManagement {
 
     private ArrayList<Client> clients;
@@ -77,7 +79,8 @@ public class ClientManagement {
     }
 
     public void printClients() {
-        clients.forEach(System.out::println);
+        clients.stream().filter(not(s -> s.getStatus().equalsIgnoreCase("Past")))
+                .forEach(System.out::println);
     }
 
     public boolean addPhoneNumber(int clientId, String number, String numberType) {
@@ -144,9 +147,10 @@ public class ClientManagement {
         return results;
     }
 
-    public String clientBrief(int clientId) {
+    public String activeClientBrief(int clientId) {
         Client client = clients.stream()
                 .filter(c -> c.getClientID() == clientId)
+                .filter(not(c -> c.getStatus().equalsIgnoreCase("Past")))
                 .findFirst()
                 .orElse(null);
         if (client == null) {
