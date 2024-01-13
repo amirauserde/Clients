@@ -12,9 +12,9 @@ public class LegalClient extends Client {
 
     @Override
     public String toString() {
-        String sb = this.getClass().getSimpleName() + "%15s".formatted(super.getClientID()) + "\n" +
+        return this.getClass().getSimpleName() + "%15s: %s".formatted("ID",super.getClientID()) + "\n" +
                 "name: %-10s National code: %s%n".formatted(companyName, nationalCode) +
-                "Priority: %s%n".formatted(super.getPriority());
-        return sb;
+                "Priority: %s%n".formatted(super.getPriority()) + "\n" +
+                super.contact.toString();
     }
 }

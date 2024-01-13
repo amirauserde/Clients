@@ -9,18 +9,18 @@ import static java.util.function.Predicate.not;
 
 public class ClientManagement {
 
-    private ArrayList<Client> clients;
-    private static ClientManagement instance;
+    private final ArrayList<Client> clients;
+    private static ClientManagement INSTANCE;
 
     public static ClientManagement getInstance() {
-        if(instance == null) {
+        if(INSTANCE == null) {
             synchronized (ClientManagement.class) {
-                if(instance == null){
-                    instance = new ClientManagement();
+                if(INSTANCE == null){
+                    INSTANCE = new ClientManagement();
                 }
             }
         }
-        return instance;
+        return INSTANCE;
     }
 
     private ClientManagement() {
@@ -32,21 +32,25 @@ public class ClientManagement {
         return client.getClientID();
     }
 
-    public int addRealClient(String firstName, String lastName, String priority) {
-        if(findClient(lastName + ", " + firstName).size() > 0) {
-            return -1;
+    public int addClient(int type, String name, String secondElement, String priority) {
+        if(findClient(name).size() > 0) {
+            if(findClient(secondElement + ", " + name).size() > 0 ||
+                    findClient(secondElement).size() > 0) {
+                return -1;
+            }
         }
-        RealClient newClient = new RealClient(firstName, lastName, ClientPriority.valueOf(priority.toUpperCase()));
+        Client newClient;
+        if(type == 1) {
+            newClient = new RealClient(name, secondElement,
+                    ClientPriority.valueOf(priority.toUpperCase()));
+        } else {
+            newClient = new LegalClient(name, secondElement,
+                    ClientPriority.valueOf(priority.toUpperCase()));
+        }
+
         return addClient(newClient);
     }
 
-    public int addLegalClient(String name, String nationalCode, String priority) {
-        if(findClient(name).size() > 0) {
-            return -1;
-        }
-        LegalClient newClient = new LegalClient(name, nationalCode, ClientPriority.valueOf(priority.toUpperCase()));
-        return addClient(newClient);
-    }
 
     public boolean priorityChange(int clientId, String priority) {
         if(ClientPriority.contains(priority)) {
@@ -78,15 +82,10 @@ public class ClientManagement {
         return false;
     }
 
-    public void printClients() {
-        clients.stream().filter(not(s -> s.getStatus().equalsIgnoreCase("Past")))
-                .forEach(System.out::println);
-    }
-
     public boolean addPhoneNumber(int clientId, String number, String numberType) {
         Contact contact = clients.stream()
                 .filter(c -> c.getClientID() == clientId)
-                .map(c -> c.getContact())
+                .map(Client::getContact)
                 .findFirst()
                 .orElse(null);
         if (contact == null) {
@@ -103,7 +102,7 @@ public class ClientManagement {
     public boolean addAddress(int clientId, String[] info) {
         Contact contact = clients.stream()
                 .filter(c -> c.getClientID() == clientId)
-                .map(c -> c.getContact())
+                .map(Client::getContact)
                 .findFirst()
                 .orElse(null);
         if (contact == null) {
@@ -120,7 +119,7 @@ public class ClientManagement {
     public void setEmail(int clientId, String emailAddress) {
         Contact contact = clients.stream()
                 .filter(c -> c.getClientID() == clientId)
-                .map(c -> c.getContact())
+                .map(Client::getContact)
                 .findFirst()
                 .orElse(null);
         if (contact == null) {
@@ -129,9 +128,6 @@ public class ClientManagement {
         contact.setEmailAddress(emailAddress);
     }
 
-    private  <T extends Client> boolean findClient(T client) {
-        return clients.stream().anyMatch(client::equals);
-    }
 
     public List<Integer> findClient(String searchItem) {
         List<Integer> results;
@@ -147,6 +143,11 @@ public class ClientManagement {
         return results;
     }
 
+    public void printClients() {
+        clients.stream().filter(not(s -> s.getStatus().equalsIgnoreCase("Past")))
+                .forEach(s -> activeClientBrief(s.getClientID()));
+    }
+
     public String activeClientBrief(int clientId) {
         Client client = clients.stream()
                 .filter(c -> c.getClientID() == clientId)
@@ -156,7 +157,7 @@ public class ClientManagement {
         if (client == null) {
             return "No client found";
         }
-        return "%d) %-15s%-5s%s".formatted(clientId,
+        return "%d) %-15s%-10s%s".formatted(clientId,
                 client.getName(), client.getPriority(), client.getStatus());
     }
 

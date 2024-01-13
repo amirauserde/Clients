@@ -1,10 +1,10 @@
 package View;
 import Service.ClientManagement;
+import util.ScannerWrapper;
 import java.util.List;
-import java.util.Scanner;
 
 public class ClientConsole implements AutoCloseable {
-    Scanner scanner = new Scanner(System.in);
+    ScannerWrapper scannerWrapper = ScannerWrapper.getInstance();
     ClientManagement newCM = ClientManagement.getInstance();
     private static ClientConsole instance;
 
@@ -30,12 +30,11 @@ public class ClientConsole implements AutoCloseable {
 
         while (menuRun) {
             System.out.println("Please choose from the options:");
-            System.out.println("""
+            String choice = scannerWrapper.getUserInput("""
                     1. Find (- edit) client
                     2. Add a client
                     3. Print clients
                     4. exit""");
-            String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1" -> findMenu();
@@ -49,33 +48,32 @@ public class ClientConsole implements AutoCloseable {
     }
 
     private void findMenu() {
-        String search = getUserInput("Enter your search");
+        String search = scannerWrapper.getUserInput("Enter your search");
         List<Integer> searchedIds =  newCM.findClient(search);
         if(searchedIds.isEmpty()) {
             System.out.println("No results found!");
         } else {
             searchedIds.forEach(clientId -> System.out.println(newCM.activeClientBrief(clientId)));
-            int chosenID = Integer.valueOf(getUserInput("For more details enter the client ID:"));
+            int chosenID = Integer.parseInt(scannerWrapper.getUserInput("For more details enter the client ID:"));
 
             if(!searchedIds.contains(chosenID)) {
                 System.out.println("Wrong ID!");
             } else {
-                clientMenu(chosenID);
+                clientDetailsMenu(chosenID);
             }
         }
     }
 
-    private void clientMenu(int clientId) {
+    private void clientDetailsMenu(int clientId) {
         System.out.println(newCM.printClientDetails(clientId));
         System.out.println();
         boolean menuRun = true;
         while (menuRun) {
-            System.out.println("""
+            String choice = scannerWrapper.getUserInput("""
                     1. Add a contact
                     2. Change status
                     3. Change priority
                     4. exit""");
-            String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1" -> addContact(clientId);
@@ -88,23 +86,20 @@ public class ClientConsole implements AutoCloseable {
     }
 
     private void addClient() {
-        int clientChoice = Integer.parseInt(getUserInput("Client type:%n1. Real%n2. Legal".formatted()));
+        int clientChoice = Integer.parseInt
+                (scannerWrapper.getUserInput("Client type:%n1. Real%n2. Legal".formatted()));
         int newClientId;
-        if(clientChoice == 1) {
-            String firstName = getUserInput("Enter first name: ");
-            String lastName = getUserInput("Enter last name: ");
-            String priority = getUserInput("Enter client's priority (CRITICAL, HIGH, MEDIUM, LOW)");
-            newClientId = newCM.addRealClient(firstName, lastName, priority);
-        } else {
-            String name = getUserInput("Enter company's name: ");
-            String nationalCode = getUserInput("Enter company's national code: ");
-            String priority = getUserInput("Enter client's priority (CRITICAL, HIGH, MEDIUM, LOW)");
-            newClientId = newCM.addLegalClient(name, nationalCode, priority);
-        }
+
+        String firstName = scannerWrapper.getUserInput("Enter first name: ");
+        String secondElement =
+                scannerWrapper.getUserInput((clientChoice == 1)?
+                        "Enter last name: " : "Enter company's national code: ");
+        String priority = scannerWrapper.getUserInput("Enter client's priority (CRITICAL, HIGH, MEDIUM, LOW)");
+        newClientId = newCM.addClient(clientChoice, firstName, secondElement, priority);
 
         if(newClientId >= 0) {
             System.out.println("Congratulations, new client added.");
-            if(getUserInput("To add contacts and address press 1").equals("1")) {
+            if(scannerWrapper.getUserInput("To add contacts and address press 1").equals("1")) {
                 addContact(newClientId);
             }
         } else {
@@ -113,21 +108,26 @@ public class ClientConsole implements AutoCloseable {
     }
 
     private void addContact(int clientId) {
-        int choice = Integer.parseInt(getUserInput("""
+        boolean addContactMenu = true;
+        while (addContactMenu) {
+            int choice = Integer.parseInt(scannerWrapper.getUserInput("""
                 Press:
                 1. To add a Phone number,
                 2. To add an Address,
-                3. To add/update email address"""));
-        switch (choice) {
-            case 1 -> addPhoneNumber(clientId);
-            case 2 -> addAddress(clientId);
-            default -> newCM.setEmail(clientId, getUserInput("Enter email address: "));
-        };
+                3. To add/update email address
+                4. To exit"""));
+            switch (choice) {
+                case 1 -> addPhoneNumber(clientId);
+                case 2 -> addAddress(clientId);
+                case 3 -> newCM.setEmail(clientId, scannerWrapper.getUserInput("Enter email address: "));
+                default -> addContactMenu = false;
+            }
+        }
     }
 
     private void addPhoneNumber(int clientId) {
-        String type = getUserInput("Enter number type (HOME, OFFICE, MOBILE, FAX, OTHER): ");
-        String number = getUserInput("Enter number (10 digits): ");
+        String type = scannerWrapper.getUserInput("Enter number type (HOME, OFFICE, MOBILE, FAX, OTHER): ");
+        String number = scannerWrapper.getUserInput("Enter number (10 digits): ");
         boolean result = newCM.addPhoneNumber(clientId, number, type);
         if(result) {
             System.out.println("Phone number added.");
@@ -138,10 +138,10 @@ public class ClientConsole implements AutoCloseable {
 
     private void addAddress(int clientID) {
         String[] info = new String[4];
-        info[3] = getUserInput("Enter Address type (MAIN, SECOND, OFFICE, DELIVERY, OTHER): ");
-        info[0] = getUserInput("Please enter the country: ");
-        info[1] = getUserInput("Please enter the city: ");
-        info[2] = getUserInput("Please enter the address: ");
+        info[3] = scannerWrapper.getUserInput("Enter Address type (MAIN, SECOND, OFFICE, DELIVERY, OTHER): ");
+        info[0] = scannerWrapper.getUserInput("Please enter the country: ");
+        info[1] = scannerWrapper.getUserInput("Please enter the city: ");
+        info[2] = scannerWrapper.getUserInput("Please enter the address: ");
         boolean result = newCM.addAddress(clientID, info);
         if(result) {
             System.out.println("Address added.");
@@ -151,24 +151,19 @@ public class ClientConsole implements AutoCloseable {
     }
 
     private void priorityChange(int clientId) {
-        String priority = getUserInput("Please Enter the new priority (CRITICAL, HIGH, MEDIUM, LOW): ");
+        String priority = scannerWrapper.getUserInput("Please Enter the new priority (CRITICAL, HIGH, MEDIUM, LOW): ");
         boolean result = newCM.priorityChange(clientId, priority);
         System.out.println(result? "Priority changed!" : "Wrong input!");
     }
 
     private void statusChange(int clientId) {
-        String status = getUserInput("Please Enter the new status (CURRENT, PAST): ");
+        String status = scannerWrapper.getUserInput("Please Enter the new status (CURRENT, PAST): ");
         boolean result = newCM.statusChange(clientId, status);
         System.out.println(result? "Status changed!" : "Wrong input!");
     }
 
-    private String getUserInput(String message) {
-        System.out.println(message);
-        return scanner.nextLine();
-    }
-
     @Override
-    public void close() throws Exception {
-        scanner.close();
+    public void close() {
+        scannerWrapper.close();
     }
 }

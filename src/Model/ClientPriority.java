@@ -7,7 +7,7 @@ public enum ClientPriority {
 
     public static boolean contains(String test) {
 
-        for (ClientPriority c : ClientPriority.values()) {
+        for (ClientPriority c : values()) {
             if (c.name().equalsIgnoreCase(test)) {
                 return true;
             }

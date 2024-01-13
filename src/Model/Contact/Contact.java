@@ -30,7 +30,7 @@ public class Contact {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("""
-                %s%n
+                %s %n
                 Email address: %s%n
                 Phone numbers:%n
                 """.formatted(contactName, emailAddress));

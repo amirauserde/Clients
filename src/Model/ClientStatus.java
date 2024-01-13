@@ -7,7 +7,7 @@ public enum ClientStatus {
 
     public static boolean contains(String test) {
 
-        for (ClientStatus c : ClientStatus.values()) {
+        for (ClientStatus c : values()) {
             if (c.name().equalsIgnoreCase(test)) {
                 return true;
             }
