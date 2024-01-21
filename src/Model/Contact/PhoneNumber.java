@@ -1,7 +1,14 @@
 package Model.Contact;
 
+import Model.ClientPriority;
+import util.LookupUtil;
+
 enum NumberType {
-    HOME, OFFICE, MOBILE, FAX, OTHER
+    HOME, OFFICE, MOBILE, FAX, OTHER;
+
+    static public NumberType lookup(String id) {
+        return LookupUtil.lookup(NumberType.class, id);
+    }
 }
 
 public class PhoneNumber {
@@ -9,11 +16,7 @@ public class PhoneNumber {
     private String number;
 
     public PhoneNumber(String number, String  numberType) {
-        try {
-            this.numberType = NumberType.valueOf(numberType.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            System.out.println("Wrong type!");
-        }
+        this.numberType = NumberType.lookup(numberType.toUpperCase());
         this.number = numberFormat(number);
     }
 

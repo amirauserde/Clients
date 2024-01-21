@@ -40,12 +40,13 @@ public class ClientManagement {
             }
         }
         Client newClient;
+
         if(type == 1) {
             newClient = new RealClient(name, secondElement,
-                    ClientPriority.valueOf(priority.toUpperCase()));
+                    ClientPriority.lookup(priority.toUpperCase()));
         } else {
             newClient = new LegalClient(name, secondElement,
-                    ClientPriority.valueOf(priority.toUpperCase()));
+                    ClientPriority.lookup(priority.toUpperCase()));
         }
 
         return addClient(newClient);
@@ -94,6 +95,9 @@ public class ClientManagement {
 
         if(contact.getNumbers().stream().anyMatch(s -> s.getNumber().equals(number))) {
             return false;
+        }
+        if(!(number.length() == 10 && number.matches("\\d{10}"))) {
+            throw new ArithmeticException("Please Enter the number in correct format!");
         }
         contact.getNumbers().add(new PhoneNumber(number, numberType));
         return true;
@@ -144,8 +148,12 @@ public class ClientManagement {
     }
 
     public void printClients() {
+        if(clients.isEmpty()) {
+            System.out.println("There is still no client :(");
+            return;
+        }
         clients.stream().filter(not(s -> s.getStatus().equalsIgnoreCase("Past")))
-                .forEach(s -> activeClientBrief(s.getClientID()));
+                .forEach(s -> System.out.println(activeClientBrief(s.getClientID())));
     }
 
     public String activeClientBrief(int clientId) {

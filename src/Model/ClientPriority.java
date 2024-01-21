@@ -1,5 +1,7 @@
 package Model;
 
+import util.LookupUtil;
+
 public enum ClientPriority {
     CRITICAL("Critical"), HIGH("High"), MEDIUM("Medium"), LOW("Low");
 
@@ -13,6 +15,11 @@ public enum ClientPriority {
             }
         }
         return false;
+    }
+
+
+    static public ClientPriority lookup(String id) {
+            return LookupUtil.lookup(ClientPriority.class, id);
     }
 
 

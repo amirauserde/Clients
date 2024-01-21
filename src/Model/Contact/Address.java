@@ -1,7 +1,12 @@
 package Model.Contact;
 
+import util.LookupUtil;
+
 enum AddressType {
-    MAIN, SECOND, OFFICE, DELIVERY, OTHER
+    MAIN, SECOND, OFFICE, DELIVERY, OTHER;
+    static public AddressType lookup(String id) {
+        return LookupUtil.lookup(AddressType.class, id);
+    }
 }
 
 public class Address {
@@ -11,11 +16,7 @@ public class Address {
     private String address;
 
     public Address(String country, String city, String address, String  addressType) {
-        try {
-            this.addressType = AddressType.valueOf(addressType);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Wrong address type!");
-        }
+        this.addressType = AddressType.lookup(addressType);
         this.country = country;
         this.city = city;
         this.address = address;
