@@ -1,6 +1,7 @@
 package Service;
 import Model.*;
 import Model.Contact.*;
+import Service.Exception.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ public class ClientManagement {
 
     private final ArrayList<Client> clients;
     private static ClientManagement INSTANCE;
+
 
     public static ClientManagement getInstance() {
         if(INSTANCE == null) {

@@ -1,5 +1,7 @@
 package Model;
 
+import util.LookupUtil;
+
 public enum ClientStatus {
     PROSPECT("Prospect"), NEW("New"), CURRENT("Current"), PAST("Past");
 
@@ -13,6 +15,9 @@ public enum ClientStatus {
             }
         }
         return false;
+    }
+    static public ClientStatus lookup(String id) {
+        return LookupUtil.lookup(ClientStatus.class, id);
     }
 
     ClientStatus(String name) {

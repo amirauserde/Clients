@@ -24,12 +24,11 @@ public abstract class Client {
         }
 
         public void setStatus(String status) {
-            ClientStatus s = ClientStatus.valueOf(status.toUpperCase());
-            this.status = s;
+            this.status = ClientStatus.lookup(status.toUpperCase());;
         }
 
         public void setPriority(String priority) {
-            ClientPriority p = ClientPriority.valueOf(priority.toUpperCase());
+            ClientPriority p = ClientPriority.lookup(priority.toUpperCase());
             this.priority = p;
         }
 

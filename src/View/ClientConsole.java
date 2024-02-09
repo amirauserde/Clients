@@ -1,12 +1,12 @@
 package View;
-import Service.ClientManagement;
+import facade.impl.ClientFacadeImpl;
 import util.ScannerWrapper;
 import java.util.List;
 import java.util.function.Function;
 
 public class ClientConsole implements AutoCloseable {
     ScannerWrapper scannerWrapper = ScannerWrapper.getInstance();
-    ClientManagement newCM = ClientManagement.getInstance();
+    ClientFacadeImpl clientFacade = ClientFacadeImpl.getInstance();
     private static ClientConsole instance;
 
     public static ClientConsole getInstance() {
@@ -40,7 +40,7 @@ public class ClientConsole implements AutoCloseable {
             switch (choice) {
                 case "1" -> findMenu();
                 case "2" -> addClient();
-                case "3" -> newCM.printClients();
+                case "3" -> clientFacade.printClients();
                 case "4" -> menuRun = false;
                 default -> System.out.println("Wrong input!");
             }
@@ -50,11 +50,11 @@ public class ClientConsole implements AutoCloseable {
 
     private void findMenu() {
         String search = scannerWrapper.getUserInput("Enter your search", Function.identity());
-        List<Integer> searchedIds =  newCM.findClient(search);
+        List<Integer> searchedIds =  clientFacade.findClient(search);
         if(searchedIds.isEmpty()) {
             System.out.println("No results found!");
         } else {
-            searchedIds.forEach(clientId -> System.out.println(newCM.activeClientBrief(clientId)));
+            searchedIds.forEach(clientId -> System.out.println(clientFacade.activeClientBrief(clientId)));
             int chosenID = scannerWrapper.
                     getUserInput("For more details enter the client ID:", Integer::parseInt);
 
@@ -67,7 +67,7 @@ public class ClientConsole implements AutoCloseable {
     }
 
     private void clientDetailsMenu(int clientId) {
-        System.out.println(newCM.printClientDetails(clientId));
+        System.out.println(clientFacade.printClientDetails(clientId));
         System.out.println();
         boolean menuRun = true;
         while (menuRun) {
@@ -102,8 +102,8 @@ public class ClientConsole implements AutoCloseable {
                 ("Enter client's priority (CRITICAL, HIGH, MEDIUM, LOW)", Function.identity());
 
         try {
-            newClientId = newCM.addClient(clientChoice, firstName, secondElement, priority);
-        } catch (RuntimeException ex) {
+            newClientId = clientFacade.addClient(clientChoice, firstName, secondElement, priority);
+        } catch (Throwable ex) {
             System.out.println(ex.getMessage());
             addClient();
         }
@@ -130,7 +130,7 @@ public class ClientConsole implements AutoCloseable {
             switch (choice) {
                 case 1 -> addPhoneNumber(clientId);
                 case 2 -> addAddress(clientId);
-                case 3 -> newCM.setEmail(clientId, scannerWrapper.
+                case 3 -> clientFacade.setEmail(clientId, scannerWrapper.
                         getUserInput("Enter email address: ", Function.identity()));
                 default -> addContactMenu = false;
             }
@@ -144,7 +144,7 @@ public class ClientConsole implements AutoCloseable {
                 getUserInput("Enter number (10 digits): ", Function.identity());
         boolean result = false;
         try {
-            result = newCM.addPhoneNumber(clientId, number, type);
+            result = clientFacade.addPhoneNumber(clientId, number, type);
         } catch(Exception ex) {
             System.out.println(ex.getMessage());
             addPhoneNumber(clientId);
@@ -167,7 +167,7 @@ public class ClientConsole implements AutoCloseable {
         info[2] = scannerWrapper.getUserInput("Please enter the address: ", Function.identity());
         boolean result = false;
         try {
-            result = newCM.addAddress(clientId, info);
+            result = clientFacade.addAddress(clientId, info);
         } catch (RuntimeException ex) {
             System.out.println(ex.getMessage());
             addPhoneNumber(clientId);
@@ -184,14 +184,14 @@ public class ClientConsole implements AutoCloseable {
         String priority = scannerWrapper.
                 getUserInput("Please Enter the new priority (CRITICAL, HIGH, MEDIUM, LOW): "
                         , Function.identity());
-        boolean result = newCM.priorityChange(clientId, priority);
+        boolean result = clientFacade.priorityChange(clientId, priority);
         System.out.println(result? "Priority changed!" : "Wrong input!");
     }
 
     private void statusChange(int clientId) {
         String status = scannerWrapper.
                 getUserInput("Please Enter the new status (CURRENT, PAST): ", Function.identity());
-        boolean result = newCM.statusChange(clientId, status);
+        boolean result = clientFacade.statusChange(clientId, status);
         System.out.println(result? "Status changed!" : "Wrong input!");
     }
 
